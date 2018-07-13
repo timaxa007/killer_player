@@ -9,6 +9,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.EntityFireball;
+import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -57,6 +60,17 @@ public class EventsForge {
 	public void sendInDeathPlayer(LivingDeathEvent event) {
 		Entity from = event.source.getSourceOfDamage();//Кто убил.
 		EntityLivingBase to = event.entityLiving;//Кого убили.
+		if (from instanceof EntityPlayerMP)
+			fromKill(from, to);
+		else if (from instanceof EntityThrowable)
+			fromKill(((EntityThrowable)from).getThrower(), to);
+		else if (from instanceof EntityArrow)
+			fromKill(((EntityArrow)from).shootingEntity, to);
+		else if (from instanceof EntityFireball)
+			fromKill(((EntityFireball)from).shootingEntity, to);
+	}
+
+	private static void fromKill(Entity from, EntityLivingBase to) {
 		if (from instanceof EntityPlayerMP) {
 			KillerPlayer killerPlayer = KillerPlayer.get((EntityPlayerMP)from);
 			if (killerPlayer == null) return;
